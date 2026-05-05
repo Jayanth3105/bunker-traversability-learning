@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="soma">
+
+	<xacro:property name="realsense_enabled" value="false"/>
+	<xacro:property name="kinect_enabled" value="true"/>
+	<xacro:property name="lidar_enabled" value="true"/>
+	<xacro:property name="imu_enabled" value="true"/>
+	<xacro:property name="gps_enabled" value="true"/>
+
+	<!-- Include files -->
+	<xacro:if value="${realsense_enabled}">
+		<xacro:include filename="$(find bunker_description)/urdf/accessories/intel_realsense.urdf.xacro"/>
+		<xacro:include filename="$(find realsense2_description)/urdf/_d455.urdf.xacro" />
+	</xacro:if>
+	<xacro:if value="${kinect_enabled}">
+		<xacro:include filename="$(find bunker_description)/urdf/azure_kinect_real.urdf.xacro"/>
+	</xacro:if>
+	<xacro:if value="${lidar_enabled}">
+		<xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro" />
+	</xacro:if>
+
+	<!-- IMU macro -->
+	<xacro:if value="${imu_enabled}">
+		<xacro:macro name="imu_macro" params="parent *origin">
+
+			<!-- General properties used for inertia computation -->
+			<xacro:property name="mass" value="0.2" />
+			<xacro:property name="width" value="0.05" />
+			<xacro:property name="depth" value="0.05" />
+			<xacro:property name="height" value="0.025" />
+
+			<!-- Joint -->
+			<joint name="imu_joint" type="fixed">
+				<xacro:insert_block name="origin" />
+				<parent link="${parent}" />
+				<child link="imu_link" />
+			</joint>
+
+			<!-- Link -->
+			<link name="imu_link">
+
+				<!-- Inertial part -->
+				<inertial>
+					<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+					<mass value="${mass}" />
+
+					<!-- Inertia matrix of a parallelepiped -->
+					<inertia ixx="${mass / 12 * (depth ** 2 + height ** 2)}" ixy="0.0" ixz="0.0" iyy="${mass / 12 * (width ** 2 + height ** 2)}" iyz="0.0" izz="${mass / 12 * (width ** 2 + depth ** 2)}" />
+				</inertial>
+
+				<!-- Visual part -->
+				<visual>
+					<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+					<geometry>
+						<box size="${width} ${depth} ${height}" />
+					</geometry>
+					<material name="red" />
+				</visual>
+
+				<!-- Collision part -->
+				<collision>
+					<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+					<geometry>
+						<box size="${width} ${depth} ${height}" />
+					</geometry>
+				</collision>
+
+			</link>
+			<!-- END link -->
+		</xacro:macro>
+	</xacro:if>
+	<!-- END IMU macro -->
+
+	<!-- GPS macro -->
+	<xacro:if value="${gps_enabled}">
+		<xacro:macro name="gps_macro" params="parent *origin">
+
+			<!-- General properties used for inertia computation -->
+			<xacro:property name="mass" value="0.2" />
+			<xacro:property name="width" value="0.05" />
+			<xacro:property name="depth" value="0.05" />
+			<xacro:property name="height" value="0.025" />
+
+			<!-- Joint -->
+			<joint name="gps_joint" type="fixed">
+				<xacro:insert_block name="origin" />
+				<parent link="${parent}" />
+				<child link="gps" />
+			</joint>
+
+			<!-- Link -->
+			<link name="gps">
+
+				<!-- Inertial part -->
+				<inertial>
+					<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+					<mass value="${mass}" />
+
+					<!-- Inertia matrix of a parallelepiped -->
+					<inertia ixx="${mass / 12 * (depth ** 2 + height ** 2)}" ixy="0.0" ixz="0.0" iyy="${mass / 12 * (width ** 2 + height ** 2)}" iyz="0.0" izz="${mass / 12 * (width ** 2 + depth ** 2)}" />
+				</inertial>
+
+				<!-- Visual part -->
+				<visual>
+					<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+					<geometry>
+						<box size="${width} ${depth} ${height}" />
+					</geometry>
+					<material name="red" />
+				</visual>
+
+				<!-- Collision part -->
+				<collision>
+					<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+					<geometry>
+						<box size="${width} ${depth} ${height}" />
+					</geometry>
+				</collision>
+				
+			</link>
+
+		</xacro:macro>
+	</xacro:if>
+	<!-- END GPS macro -->
+
+	<!-- Realsense macro -->
+    <xacro:if value="${realsense_enabled}">
+		<xacro:macro name="camera_macro" params="parent *origin">
+			<link name="realsense_mountpoint"/>
+			<joint name="realsense_mountpoint_joint" type="fixed">
+				<xacro:insert_block name="origin" />
+				<parent link="${parent}" />
+				<child link="realsense_mountpoint" />
+			</joint>
+			<!-- <xacro:intel_realsense_mount prefix="camera" topic="realsense" parent_link="realsense_mountpoint"/> -->
+			<xacro:sensor_d455 parent="${parent}" name="camera" use_nominal_extrinsics="true" >
+				<xacro:insert_block name="origin" />
+			</xacro:sensor_d455>
+		</xacro:macro>
+    </xacro:if>
+	<!-- END Realsense macro -->
+
+	<!-- Realsense macro -->
+    <xacro:if value="${kinect_enabled}">
+		<xacro:macro name="kinect_macro" params="parent *origin">
+
+
+			<xacro:azure_kinect_mount />
+			<joint name="azure_base_joint" type="fixed">
+				<xacro:insert_block name="origin" />
+				<parent link="${parent}" />
+				<child link="camera_base" />
+			</joint>
+
+
+		</xacro:macro>
+    </xacro:if>
+	<!-- END Realsense macro -->
+	
+	<!-- Velodyne macro -->
+	<xacro:if value="${lidar_enabled}">
+		<xacro:macro name="velodyne_macro" params="parent *origin">
+			<!-- <xacro:VLP-16 parent="${parent}" name="velodyne" topic="/velodyne_points" min_range="0.0" max_range="5.0" noise="0.0"> -->
+			<xacro:VLP-16 parent="${parent}" name="velodyne" topic="/velodyne_points" min_range="0.9" max_range="130.0" noise="0.008">
+				<xacro:insert_block name="origin" />
+			</xacro:VLP-16>
+		</xacro:macro>
+	</xacro:if>
+	<!-- END Velodyne macro -->
+
+</robot>

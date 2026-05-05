@@ -1,0 +1,14 @@
+semantic:
+  ros__parameters:
+    image_width : 1280
+    image_heigh : 720
+    camera_info_topic: "rgb/camera_info"
+    color_image_topic: "rgb/image_raw"
+    depth_image_topic: "depth_to_rgb/image_raw"
+    frame_id: "rgb_camera_link"
+    dataset: "RUGDDataset" # ade20k
+    # dataset: "sunrgbd" # sunrgbd
+    model_path: "/home/hayashi/develop/mmsegmentation/work_dirs/BCRobo/BCrobo_OCRnet_poly2k_warmup/latest.pth"
+    config_path: "/home/hayashi/ros2_ws/src/bunker_ros2/bunker_vis/bunker_vis/mmseg/configs/rugd/rugdconfig.py"
+    # model_path: "/home/frank/models/pspnet_sunrgbd_best_model180625_5k.pth"
+    # model_path: "/home/frank/models/ade20k-resnet50-upernet.pth"
