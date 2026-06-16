@@ -1,4 +1,4 @@
-# 2026-06-17 — Isaac Sim Sensor Integration Progress
+# Isaac Sim Sensor Stack Validation — 2026-06-17
 
 ## Objective
 
@@ -36,6 +36,10 @@ The VLS-128 sensor model is physically larger than the original VLP16 mounting l
 
 The LiDAR origin overlapped with the robot mast/chassis, causing immediate self-intersections and ray occlusion.
 
+#### Sensor Placement Issue
+
+![Oversized VLS-128](../images/oversized_vls32.png)
+
 ### Fix
 
 Raised the LiDAR sensor along the Z-axis:
@@ -58,10 +62,12 @@ width: 240012
 
 Verified PointCloud2 publication.
 
+![LiDAR Point Cloud](../images/LIDARPOINTS_WORKING.png)
+
 Topic:
 
 ```bash
-/lidar_points
+/ lidar_points
 ```
 
 Message Type:
@@ -90,7 +96,11 @@ Topic:
 /rgb
 ```
 
-Validation:
+### Validation
+
+![RGB Camera Output](../images/BUNKER_TOPVIEW.png)
+
+Observations:
 
 - Environment visible
 - Cube visible
@@ -124,7 +134,11 @@ width: 1280
 frame_id: sim_camera
 ```
 
-Validation:
+### Validation
+
+![Depth Camera Output](../images/DEPTH_WORKING.png)
+
+Observations:
 
 - Depth image displayed successfully in RViz
 - Correct depth gradient observed across cube surface
@@ -326,4 +340,20 @@ Successfully validated the complete Isaac Sim sensor stack.
 
 ---
 
-**Status:** Sensor stack operational and ready for TF, odometry, and SLAM integration.
+## Repository Snapshot
+
+### Isaac Sim Bunker Setup
+
+![Bunker Setup](../images/BUNKER_TOPVIEW.png)
+
+### LiDAR Point Cloud
+
+![LiDAR Point Cloud](../images/LIDARPOINTS_WORKING.png)
+
+### Depth Camera Output
+
+![Depth Camera Output](../images/DEPTH_WORKING.png)
+
+---
+
+**Status:** Sensor stack operational and ready for TF, odometry, SLAM, mapping, and self-supervised learning integration.
