@@ -1,71 +1,174 @@
 # Self-Supervised Traversability Learning for Risk-Aware Robot Navigation
 
 ## 🚀 Overview
-This project focuses on building a learning-based navigation system for mobile robots operating in unstructured environments.  
-Instead of relying on hand-engineered costmaps, the robot learns terrain traversability and risk from its own interaction experience.
 
-The system is being developed and validated using the **AgileX BUNKER robot platform** in simulation.
+This master's research project investigates self-supervised traversability learning for autonomous mobile robot navigation in unstructured environments.
+
+Traditional navigation systems rely on manually designed costmaps and heuristic terrain assumptions. This work explores how a robot can learn terrain traversability and navigation risk directly from sensor observations and interaction experience.
+
+The system is being developed using the **AgileX BUNKER tracked robot platform** and validated in simulation before deployment on a physical robot.
 
 ---
-<img width="608" height="801" alt="image" src="https://github.com/user-attachments/assets/49e8f032-63cc-49ee-bce0-9c48b31902e6" />
 
-## 🧠 Key Idea
-Traditional navigation systems assign fixed costs to terrain.  
-This project aims to replace that with:
+<p align="center">
+  <img src="docs/images/BUNKER_TOPVIEW.png" width="500">
+</p>
 
-- Learned traversability from robot experience
-- Risk-aware path planning
-- Adaptive behavior in complex terrain
+---
+
+## 🎯 Research Goal
+
+Develop a navigation framework capable of:
+
+* Learning terrain traversability from sensor data
+* Estimating navigation risk in unknown environments
+* Improving path planning decisions using learned terrain representations
+* Transferring learned behavior from simulation to real-world deployment
 
 ---
 
 ## 🏗️ System Architecture
 
-- **Robot Platform:** AgileX BUNKER (tracked robot)
-- **Framework:** ROS2 (Nav2 stack)
-- **Simulation:** NVIDIA Isaac Sim, Gazebo
-- **Sensors:**
-  - LiDAR
-  - RGB-D Camera
-  - IMU
-- **Learning Approach:** Self-supervised terrain understanding (in progress)
+### Robot Platform
+
+* AgileX BUNKER UGV (Tracked Mobile Robot)
+
+### Software Framework
+
+* ROS2 Humble
+* Nav2 Navigation Stack
+* RTAB-Map (Planned)
+* SLAM Toolbox (Planned)
+
+### Simulation Platforms
+
+* NVIDIA Isaac Sim
+* Gazebo
+
+### Sensors
+
+* RTX LiDAR (VLP16-equivalent simulation setup)
+* RGB Camera
+* Depth Camera
+* IMU
+
+### Learning Pipeline
+
+* Self-Supervised Traversability Learning (In Development)
+* Risk-Aware Navigation (Planned)
 
 ---
 
-## ⚙️ Current Implementation
+## 🔬 Current Progress
 
-- ROS2 workspace setup for BUNKER robot
-- URDF/xacro modeling adapted for simulation environments
-- Sensor integration (LiDAR + RGB-D + IMU)
-- Full TF tree configuration
-- Nav2 navigation pipeline setup
-- Simulation testing in Isaac Sim and Gazebo
+### Robot Modeling & Simulation
+
+* [x] BUNKER URDF integration
+* [x] Robot import into Isaac Sim
+* [x] Sensor mounting and configuration
+* [x] ROS2 bridge integration
+
+### Sensor Validation
+
+* [x] LiDAR publishing to ROS2
+* [x] RGB camera streaming
+* [x] Depth camera streaming
+* [x] IMU publishing
+* [x] RViz validation of sensor outputs
+
+### Navigation Stack
+
+* [ ] TF tree configuration
+* [ ] Odometry integration
+* [ ] SLAM integration
+* [ ] Nav2 validation
+
+### Learning Pipeline
+
+* [ ] Dataset collection
+* [ ] Traversability label generation
+* [ ] Self-supervised model training
+* [ ] Risk-aware costmap generation
+* [ ] Sim-to-real evaluation
 
 ---
 
-## 🛠️ My Contributions
+## 🛠️ Technical Contributions
 
-- Designed and adapted URDF/xacro models for the BUNKER robot
-- Ported and modified robot description from Unity/URDF references for compatibility with NVIDIA Isaac Sim
-- Integrated and validated multi-sensor setup (LiDAR, RGB-D, IMU)
-- Configured ROS2 Nav2 navigation stack for simulation-based testing
-- Performed iterative testing and tuning of robot behavior in Isaac Sim Lab
-- Built and maintained full ROS2 workspace for navigation and simulation experiments
+### Robot Integration
 
+* Adapted and validated BUNKER robot descriptions for simulation environments
+* Configured robot assets for NVIDIA Isaac Sim
+* Integrated ROS2 communication interfaces
+
+### Sensor Integration
+
+* Configured LiDAR, RGB-D camera, and IMU sensors
+* Established ROS2 sensor publishing pipelines
+* Validated sensor outputs through RViz visualization
+
+### Simulation Environment
+
+* Built simulation workflows using NVIDIA Isaac Sim
+* Conducted sensor testing and validation
+* Prepared simulation framework for SLAM and learning experiments
+
+---
+
+## 📂 Repository Structure
+
+```text
+docs/
+├── progress_logs/
+├── images/
+├── reports/
+└── presentations/
+
+src/
+├── bunker_description/
+├── bunker_nav/
+├── bunker_bringup/
+└── simulation/
+```
+
+---
 
 ## 📊 Future Work
 
-- Self-supervised traversability learning model
-- Risk-aware costmap integration in Nav2
-- Simulation-to-real transfer
-- Deployment on physical BUNKER robot
+### Navigation
+
+* Configure TF tree and odometry
+* Integrate RTAB-Map
+* Generate occupancy and elevation maps
+* Validate autonomous navigation
+
+### Learning
+
+* Create traversability dataset
+* Train self-supervised terrain understanding models
+* Integrate learned traversability into Nav2
+* Evaluate risk-aware path planning
+
+### Deployment
+
+* Transfer system to physical BUNKER robot
+* Validate performance in real-world environments
+* Analyze sim-to-real transfer effectiveness
 
 ---
 
-## 🎯 Goal
-Enable safe and intelligent navigation for robots operating in challenging terrains such as slopes, loose ground, and rough outdoor environments.
+## 🧠 Technology Stack
+
+**ROS2 • Nav2 • NVIDIA Isaac Sim • Gazebo • LiDAR • RGB-D • IMU • URDF/Xacro • SLAM • RTAB-Map • Machine Learning**
 
 ---
 
-## 🧠 Tech Stack
-ROS2 • Nav2 • Isaac Sim • Gazebo • LiDAR • RGB-D • IMU • URDF/xacro • SLAM
+## 📌 Project Status
+
+**Current Phase:** Sensor Integration & Simulation Validation
+
+**Next Milestone:** TF Configuration → Odometry → SLAM Integration → Dataset Collection
+
+---
+
+Developed as part of a Master's research project in autonomous robot navigation and traversability learning.
