@@ -1,5 +1,7 @@
 # Isaac Sim Sensor Stack Validation — 2026-06-17
+# Test
 
+![test](photos/LIDARPOINTS_WORKING.png)
 ## Objective
 
 Integrate and validate the Bunker sensor stack inside Isaac Sim before SLAM and self-supervised terrain learning development.
