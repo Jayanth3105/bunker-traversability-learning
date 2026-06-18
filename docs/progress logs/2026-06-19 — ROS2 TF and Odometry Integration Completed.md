@@ -4,7 +4,7 @@
 
 Establish a complete ROS2 TF and odometry pipeline inside Isaac Sim to support future SLAM, localization, and navigation experiments.
 
-![Bunker Isaac Sim Platform](../images/bunker_slam_ready.png)
+![Bunker Isaac Sim Platform](../images/BUNKER_VIEW.png)
 
 *Figure 1. Current Bunker simulation platform configured with LiDAR, RGB-D camera, IMU, TF tree, and odometry.*
 
@@ -224,7 +224,7 @@ Isaac Compute Odometry Orientation
     → Rotation
 ```
 
-![Final Isaac TF/Odom Graph](../images/isaac_tf_odom_graph.png)
+![Final Isaac TF/Odom Graph](../images/tf_odom_graph.png)
 
 *Figure 2. Final Omnigraph configuration used to publish odometry and dynamic transforms.*
 
