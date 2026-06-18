@@ -4,17 +4,21 @@
 
 Establish a complete ROS2 TF and odometry pipeline inside Isaac Sim to support future SLAM, localization, and navigation experiments.
 
+![Bunker Isaac Sim Platform](../images/bunker_slam_ready.png)
+
+*Figure 1. Current Bunker simulation platform configured with LiDAR, RGB-D camera, IMU, TF tree, and odometry.*
+
 ---
 
 ## Background
 
 Previous sensor validation confirmed successful publication of:
 
-* LiDAR point clouds
-* RGB camera images
-* Depth images
-* IMU data
-* Camera calibration information
+- LiDAR point clouds
+- RGB camera images
+- Depth images
+- IMU data
+- Camera calibration information
 
 However, the navigation stack remained incomplete because the required transform between `odom` and `base_link` was not being published.
 
@@ -86,21 +90,105 @@ was missing.
 
 ---
 
-## Temporary Verification
+## Debugging Timeline
 
-A temporary static transform was created:
+### 1. RViz Validation Failure
+
+RViz could not use:
+
+```text
+odom
+```
+
+as the Fixed Frame.
+
+Errors:
+
+```text
+Frame [odom] does not exist
+```
+
+---
+
+### 2. TF Lookup Failure
+
+Running:
+
+```bash
+ros2 run tf2_ros tf2_echo odom base_link
+```
+
+returned:
+
+```text
+Invalid frame ID "odom"
+```
+
+indicating the frame did not exist in the TF tree.
+
+---
+
+### 3. Sensor TF Verification
+
+Inspection of:
+
+```bash
+ros2 topic echo /tf --once
+```
+
+confirmed only:
+
+```text
+base_link → body_link
+base_link → realsense_D455_link
+base_link → xsens_imu_link
+base_link → velodyne_VLP16_link
+```
+
+were being published.
+
+---
+
+### 4. Temporary Static Transform Test
+
+To isolate the issue:
 
 ```bash
 ros2 run tf2_ros static_transform_publisher \
 0 0 0 0 0 0 odom base_link
 ```
 
-Result:
+was launched.
 
-* RViz accepted `odom` as Fixed Frame
-* TF tree became valid
+Results:
 
-This confirmed that the missing transform was the root cause.
+- RViz accepted `odom`
+- TF tree became valid
+- Sensor hierarchy appeared correctly
+
+This confirmed the missing transform was the root cause.
+
+---
+
+### 5. Isaac Omnigraph Inspection
+
+Existing nodes:
+
+```text
+Isaac Compute Odometry
+ROS2 Publish Odometry
+ROS2 Publish Transform Tree
+```
+
+Observations:
+
+- `/odom` topic published correctly
+- Sensor transforms published correctly
+- No node generated:
+
+```text
+odom → base_link
+```
 
 ---
 
@@ -117,6 +205,7 @@ Configuration:
 ```text
 Parent Frame Id = odom
 Child Frame Id  = base_link
+Static Publisher = False
 ```
 
 Connections:
@@ -135,13 +224,15 @@ Isaac Compute Odometry Orientation
     → Rotation
 ```
 
-This enabled Isaac Sim to publish a dynamic transform directly from the computed odometry.
+![Final Isaac TF/Odom Graph](../images/isaac_tf_odom_graph.png)
+
+*Figure 2. Final Omnigraph configuration used to publish odometry and dynamic transforms.*
 
 ---
 
 ## Validation
 
-### Dynamic TF Publication
+### TF Publication
 
 Verification:
 
@@ -156,9 +247,13 @@ frame_id: odom
 child_frame_id: base_link
 ```
 
+![TF Publication Validation](../images/tf_publication_validation.png)
+
+*Figure 3. Successful publication of the odom → base_link transform.*
+
 ---
 
-### Transform Lookup
+### Dynamic Transform Validation
 
 Verification:
 
@@ -166,7 +261,7 @@ Verification:
 ros2 run tf2_ros tf2_echo odom base_link
 ```
 
-Output continuously updated:
+Output updated continuously during robot motion:
 
 ```text
 Translation: [0.125, 0.000, -0.274]
@@ -175,19 +270,58 @@ Translation: [0.955, 0.010, -0.264]
 Translation: [2.729, 0.151, -0.289]
 ```
 
-confirming that robot motion was correctly reflected in the TF tree.
+Robot position and heading changed correctly as the robot moved.
+
+![Dynamic TF Validation](../images/odom_base_link_tf_success.png)
+
+*Figure 4. Dynamic odom → base_link transform updating during robot motion.*
 
 ---
 
-### Odometry Validation
+## Final TF Tree
 
-Robot movement through joystick control produced:
+Verification:
 
-* Continuous position updates
-* Continuous orientation updates
-* Consistent odometry publication
+```bash
+ros2 run tf2_tools view_frames
+```
 
-Pipeline verified:
+Final hierarchy:
+
+```text
+odom
+ └── base_link
+      ├── body_link
+      ├── realsense_D455_link
+      ├── xsens_imu_link
+      └── velodyne_VLP16_link
+```
+
+![Final TF Tree](../images/final_tf_tree.png)
+
+*Figure 5. Final ROS2 TF hierarchy generated after odometry integration.*
+
+This hierarchy matches the structure required by:
+
+- RTAB-Map
+- SLAM Toolbox
+- Nav2
+- robot_localization
+
+---
+
+## Additional Findings
+
+### Dynamic Odometry Verified
+
+Driving the robot confirmed:
+
+- Position updates
+- Orientation updates
+- TF updates
+- Consistent odometry publication
+
+Pipeline:
 
 ```text
 Joystick
@@ -207,47 +341,23 @@ odom → base_link TF
 
 ---
 
-## Current TF Tree
+### Vertical Offset Observation
 
-```text
-odom
- └── base_link
-      ├── body_link
-      ├── realsense_D455_link
-      ├── xsens_imu_link
-      └── velodyne_VLP16_link
-```
-
-This matches the structure required by:
-
-* RTAB-Map
-* SLAM Toolbox
-* Nav2
-* robot_localization
-
----
-
-## Remaining Observation
-
-The transform reports:
-
-```text
-z ≈ -0.289 m
-```
-
-for:
+Observed:
 
 ```text
 odom → base_link
+
+z ≈ -0.289 m
 ```
 
-Although `base_link` appears correctly positioned inside Isaac Sim, the odometry computation introduces a vertical offset.
+Although `base_link` itself appears correctly positioned inside Isaac Sim, odometry introduces a constant vertical offset.
 
 Potential causes:
 
-* Articulation root offset
-* Physics root transform
-* USD import origin mismatch
+- Articulation root offset
+- Physics root transform
+- USD import origin mismatch
 
 This does not currently prevent SLAM operation and will be investigated later.
 
@@ -257,33 +367,47 @@ This does not currently prevent SLAM operation and will be investigated later.
 
 ### Completed
 
-* [x] ROS2 Odometry Publication
-* [x] Dynamic odom → base_link TF
-* [x] Sensor TF Hierarchy
-* [x] RViz Fixed Frame Validation
-* [x] Motion Tracking Validation
-* [x] TF Lookup Verification
+- [x] ROS2 Odometry Publication
+- [x] Sensor TF Publication
+- [x] Dynamic odom → base_link TF
+- [x] RViz Fixed Frame Validation
+- [x] Motion Tracking Validation
+- [x] TF Lookup Validation
+- [x] Final TF Tree Verification
 
 ### Pending
 
-* [ ] Investigate base_link vertical offset
-* [ ] RTAB-Map Integration
-* [ ] Mapping Validation
-* [ ] Loop Closure Testing
+- [ ] Investigate vertical offset in odometry
+- [ ] RTAB-Map integration
+- [ ] Mapping experiments
+- [ ] Loop closure testing
+- [ ] Navigation stack validation
 
 ---
 
 ## Status
 
-The Isaac Sim platform now provides:
+The Isaac Sim Bunker platform now provides:
 
-* LiDAR
-* RGB Camera
-* Depth Camera
-* IMU
-* TF Tree
-* Odometry
+- Velodyne VLP16 LiDAR
+- Intel RealSense D455 RGB-D camera
+- Xsens IMU
+- ROS2 TF hierarchy
+- ROS2 odometry
+- Dynamic robot transforms
 
-in a SLAM-ready configuration.
+The simulation environment is now considered SLAM-ready.
 
-The project can now proceed to RTAB-Map integration and map generation experiments.
+Next milestone:
+
+```text
+RTAB-Map Integration
+      ↓
+Map Generation
+      ↓
+Loop Closure Validation
+      ↓
+Nav2 Integration
+      ↓
+Traversability Learning Pipeline
+```
