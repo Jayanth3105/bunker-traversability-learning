@@ -78,9 +78,9 @@ Develop a navigation framework capable of:
 
 ### Navigation Stack
 
-* [ ] TF tree configuration
-* [ ] Odometry integration
-* [ ] SLAM integration
+* [x] TF tree configuration
+* [x] Odometry integration
+* [x] SLAM integration
 * [ ] Nav2 validation
 
 ### Learning Pipeline
